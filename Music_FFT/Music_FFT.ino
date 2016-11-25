@@ -35,12 +35,12 @@
 
 #include <FHT.h> // include the library
 
-#define THRESHOLD 50
+uint8_t THRESHOLD[] = {20,15,90,90,90,60,60,35};
 
 // Attempt to 'zero out' noise when line in is 'quiet'.  You can change this to make some segments more sensitive.
 // int  oct_bias[] = { 231, 215, 80, 55, 54, 82, 65};
 
-int  oct_bias[] = { 150, 134, 40, 48, 54,55, 82, 65};
+int  oct_bias[] = { 217, 201, 65, 46, 50,55, 55, 50};
 
 // Divide Threshold by 2 for top octave? 1 - yes 2 - no.  Makes highest frequency blink more.
 #define TOP_OCTAVE_DIVIDE true 
@@ -72,12 +72,12 @@ void setup() {
       for (uint8_t j=0; j<4; j++){
           strip[j].begin();
           for (int i = 0; i<PIXIEL_NUM; i++) {
-                strip[0].setPixelColor(i,0xA0,0xA0,00);
-                strip[0].show();
+                strip[j].setPixelColor(i,0xA0,0xA0,00);
+                strip[j].show();
           }          
       }
 
-    delay(500);
+    delay(1000);
      
     #if FASTADC
      // set prescale to 16
@@ -109,8 +109,8 @@ void loop() {
     Serial.println("start");
     for (uint8_t i = 0 ; i < 8 ; i++) {
       // Serial.print(fht_log_out[i]); // send out the data
-      Serial.print(fht_oct_out[i]);
-      //Serial.print(fht_oct_out[i] - oct_bias[i]);
+      //Serial.print(fht_oct_out[i]);
+      Serial.print(fht_oct_out[i] - oct_bias[i]);
       Serial.print(" "); // send out the data
     }
     Serial.println(" ");
@@ -125,7 +125,7 @@ void timerIsrFeedFog()
 
 void frequencyGraph() {
     for(uint8_t i=0; i<8; i++) {
-        if (abs((fht_oct_out[i] - oct_bias[i])) > THRESHOLD) {
+        if (abs((fht_oct_out[i] - oct_bias[i])) > THRESHOLD[i]) {
                 for (uint8_t j=(i%2)*(PIXIEL_NUM/2); j<(i%2+1)*(PIXIEL_NUM/2); j++){
                     // strip[i/2].setPixelColor(i,fht_oct_out[i],0xA0,00);
                     strip[i/2].setPixelColor(j,RGB[i]);
